@@ -6,14 +6,7 @@
  */
 
 import React, {useState} from 'react';
-import {
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  View,
-  Text,
-  FlatList,
-} from 'react-native';
+import {Pressable, SafeAreaView, View, Text, FlatList} from 'react-native';
 import Title from './components/Title/Title';
 import {faEnvelope} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -116,7 +109,7 @@ const App = () => {
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [renderedData, setRenderedData] = useState(data.slice(0, pageSize));
   const [renderedDataPosts, setRenderedDataPosts] = useState(
-    posts.slice(0, pageSize),
+    posts.slice(0, pageSizePosts),
   );
 
   const pagination = (data, pageNumber, pageSize, posts = false) => {
@@ -135,67 +128,75 @@ const App = () => {
 
   return (
     <SafeAreaView>
-      <ScrollView>
-        <View style={style.header}>
-          <Title title="Let’s Explore" />
-          <Pressable style={style.messageIcon}>
-            <FontAwesomeIcon icon={faEnvelope} color={'#CACDDE'} size={20} />
-            <View style={style.messageNumberContainer}>
-              <Text style={style.messageNumber}>2</Text>
+      <FlatList
+        ListHeaderComponent={
+          <>
+            <View style={style.header}>
+              <Title title="Let’s Explore" />
+              <Pressable style={style.messageIcon}>
+                <FontAwesomeIcon
+                  icon={faEnvelope}
+                  color={'#CACDDE'}
+                  size={20}
+                />
+                <View style={style.messageNumberContainer}>
+                  <Text style={style.messageNumber}>2</Text>
+                </View>
+              </Pressable>
             </View>
-          </Pressable>
-        </View>
-        <View style={style.userStoryContainer}>
-          <FlatList
-            onMomentumScrollBegin={() => setIsLoadingPosts(false)}
-            onEndReachedThreshold={0.5}
-            keyExtractor={item => item.id.toString()}
-            onEndReached={() => {
-              if (!isLoading) {
-                setIsLoading(true);
-                setRenderedData(prev => [
-                  ...prev,
-                  ...pagination(data, pageNumber + 1, pageSize),
-                ]);
-                setIsLoading(false);
-              }
-            }}
-            showsHorizontalScrollIndicator={false}
-            horizontal={true}
-            data={renderedData}
-            renderItem={({item}) => <UserStory firstName={item.firstName} />}
-          />
-        </View>
-        <View style={style.userPostContainer}>
-          <FlatList
-            onMomentumScrollBegin={() => setIsLoadingPosts(false)}
-            onEndReachedThreshold={0.5}
-            keyExtractor={item => item.id.toString() + 'post'}
-            onEndReached={() => {
-              if (!isLoading) {
-                setIsLoadingPosts(true);
-                setRenderedDataPosts(prev => [
-                  ...prev,
-                  ...pagination(posts, pageNumber + 1, pageSize, true),
-                ]);
-                setIsLoadingPosts(false);
-              }
-            }}
-            showsVerticalScrollIndicator={false}
-            data={renderedDataPosts}
-            renderItem={({item}) => (
-              <UserPost
-                firstName={item.firstName}
-                lastName={item.lastName}
-                comments={item.comments}
-                likes={item.likes}
-                bookmarks={item.bookmarks}
-                location={item.location}
+            <View style={style.userStoryContainer}>
+              <FlatList
+                onMomentumScrollBegin={() => setIsLoadingPosts(false)}
+                onEndReachedThreshold={0.5}
+                keyExtractor={item => item.id.toString()}
+                onEndReached={() => {
+                  if (!isLoading) {
+                    setIsLoading(true);
+                    setRenderedData(prev => [
+                      ...prev,
+                      ...pagination(data, pageNumber + 1, pageSize),
+                    ]);
+                    setIsLoading(false);
+                  }
+                }}
+                showsHorizontalScrollIndicator={false}
+                horizontal={true}
+                data={renderedData}
+                renderItem={({item}) => (
+                  <UserStory firstName={item.firstName} />
+                )}
               />
-            )}
-          />
-        </View>
-      </ScrollView>
+            </View>
+          </>
+        }
+        onMomentumScrollBegin={() => setIsLoadingPosts(false)}
+        onEndReachedThreshold={0.5}
+        keyExtractor={item => item.id.toString() + 'post'}
+        onEndReached={() => {
+          if (!isLoadingPosts) {
+            setIsLoadingPosts(true);
+            setRenderedDataPosts(prev => [
+              ...prev,
+              ...pagination(posts, postPageNumber + 1, pageSizePosts, true),
+            ]);
+            setIsLoadingPosts(false);
+          }
+        }}
+        showsVerticalScrollIndicator={false}
+        data={renderedDataPosts}
+        renderItem={({item}) => (
+          <View style={style.userPostContainer}>
+            <UserPost
+              firstName={item.firstName}
+              lastName={item.lastName}
+              comments={item.comments}
+              likes={item.likes}
+              bookmarks={item.bookmarks}
+              location={item.location}
+            />
+          </View>
+        )}
+      />
     </SafeAreaView>
   );
 };

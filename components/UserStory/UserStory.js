@@ -1,14 +1,13 @@
 import React from 'react';
-import {Text, View, Image} from 'react-native';
+import {Text, View} from 'react-native';
 import PropTypes from 'prop-types';
 import style from './style';
+import UserProfileImage from '../UserProfileImage/UserProfileImage';
 
 const UserStory = props => {
   return (
     <View style={style.storyContainer}>
-      <View style={style.userImageContainer}>
-        <Image source={require('../../assets/images/default_profile.png')} />
-      </View>
+      <UserProfileImage />
       <Text style={style.name}>{props.firstName}</Text>
     </View>
   );
