@@ -19,6 +19,7 @@ import {faEnvelope} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import style from './assets/styles/main';
 import UserStory from './components/UserStory/UserStory';
+import UserPost from './components/UserPost/UserPost';
 
 const App = () => {
   //All of the items in our stories
@@ -115,7 +116,7 @@ const App = () => {
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [renderedData, setRenderedData] = useState(data.slice(0, pageSize));
   const [renderedDataPosts, setRenderedDataPosts] = useState(
-    data.slice(0, pageSize),
+    posts.slice(0, pageSize),
   );
 
   const pagination = (data, pageNumber, pageSize, posts = false) => {
@@ -146,6 +147,7 @@ const App = () => {
         </View>
         <View style={style.userStoryContainer}>
           <FlatList
+            onMomentumScrollBegin={() => setIsLoadingPosts(false)}
             onEndReachedThreshold={0.5}
             keyExtractor={item => item.id.toString()}
             onEndReached={() => {
@@ -164,7 +166,35 @@ const App = () => {
             renderItem={({item}) => <UserStory firstName={item.firstName} />}
           />
         </View>
-        <View style={style.userPostContainer} />
+        <View style={style.userPostContainer}>
+          <FlatList
+            onMomentumScrollBegin={() => setIsLoadingPosts(false)}
+            onEndReachedThreshold={0.5}
+            keyExtractor={item => item.id.toString() + 'post'}
+            onEndReached={() => {
+              if (!isLoading) {
+                setIsLoadingPosts(true);
+                setRenderedDataPosts(prev => [
+                  ...prev,
+                  ...pagination(posts, pageNumber + 1, pageSize, true),
+                ]);
+                setIsLoadingPosts(false);
+              }
+            }}
+            showsVerticalScrollIndicator={false}
+            data={renderedDataPosts}
+            renderItem={({item}) => (
+              <UserPost
+                firstName={item.firstName}
+                lastName={item.lastName}
+                comments={item.comments}
+                likes={item.likes}
+                bookmarks={item.bookmarks}
+                location={item.location}
+              />
+            )}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
