@@ -5,8 +5,15 @@
  * @format
  */
 
-import React, {useState} from 'react';
-import {Pressable, SafeAreaView, View, Text, FlatList} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  Pressable,
+  SafeAreaView,
+  View,
+  Text,
+  FlatList,
+  Dimensions,
+} from 'react-native';
 import Title from './components/Title/Title';
 import {faEnvelope} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -111,6 +118,16 @@ const App = () => {
   const [renderedDataPosts, setRenderedDataPosts] = useState(
     posts.slice(0, pageSizePosts),
   );
+  const [screenData, setScreenData] = useState(Dimensions.get('screen'));
+
+  useEffect(() => {
+    console.log(screenData);
+    //If our window size updates, this event listener will run
+    Dimensions.addEventListener('change', result => {
+      console.log('changed screen data');
+      setScreenData(result.screen);
+    });
+  }, []);
 
   const pagination = (data, pageNumber, pageSize, posts = false) => {
     let startIndex = (pageNumber - 1) * pageSize;
@@ -140,7 +157,13 @@ const App = () => {
                   size={20}
                 />
                 <View style={style.messageNumberContainer}>
-                  <Text style={style.messageNumber}>2</Text>
+                  <Text
+                    style={[
+                      style.messageNumber,
+                      {fontSize: screenData.height / 130},
+                    ]}>
+                    2
+                  </Text>
                 </View>
               </Pressable>
             </View>
